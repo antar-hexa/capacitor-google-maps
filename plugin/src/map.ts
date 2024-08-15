@@ -19,9 +19,10 @@ import type {
   CircleClickCallbackData,
   Polyline,
   PolylineCallbackData,
+  LatLng,
 } from './definitions';
 import { LatLngBounds, MapType } from './definitions';
-import type { CreateMapArgs } from './implementation';
+import type { CreateMapArgs, MoveMarkerArgs, UpdateMarkerArgs, UpdateMarkerOptionsArgs } from './implementation';
 import { CapacitorGoogleMaps } from './implementation';
 
 export interface GoogleMapInterface {
@@ -37,6 +38,8 @@ export interface GoogleMapInterface {
   disableClustering(): Promise<void>;
   addMarker(marker: Marker): Promise<string>;
   addMarkers(markers: Marker[]): Promise<string[]>;
+  moveMarker(args: MoveMarkerArgs): Promise<void>;
+  updateMarker(args: UpdateMarkerArgs): Promise<void>;
   removeMarker(id: string): Promise<void>;
   removeMarkers(ids: string[]): Promise<void>;
   addPolygons(polygons: Polygon[]): Promise<string[]>;
@@ -355,6 +358,48 @@ export class GoogleMap {
     });
 
     return res.ids;
+  }
+
+  /**
+   * Moves a marker to another location
+   *
+   * @param markers
+   * @returns
+   */
+  async moveMarker(markerId: string, position:LatLng): Promise<void> {
+    await CapacitorGoogleMaps.moveMarker({
+      id: this.id,
+      markerId: markerId,
+      position: position
+    });
+  }
+
+  /**
+   * Updates a marker to another location
+   *
+   * @param markers
+   * @returns
+   */
+  async updateMarker(markerId: string, options: UpdateMarkerOptionsArgs): Promise<void> {
+    await CapacitorGoogleMaps.updateMarker({
+      id: this.id,
+      markerId: markerId,
+      options: options
+    });
+  }
+
+  /**
+   * Rotates a marker
+   *
+   * @param markers
+   * @returns
+   */
+  async rotateMarker(markerId: string, degree:number): Promise<void> {
+    await CapacitorGoogleMaps.rotateMarker({
+      id: this.id,
+      markerId: markerId,
+      degree
+    });
   }
 
   /**

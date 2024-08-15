@@ -27,6 +27,9 @@ import type {
   RemoveCirclesArgs,
   AddPolylinesArgs,
   RemovePolylinesArgs,
+  MoveMarkerArgs,
+  RotateMarkerArgs,
+  UpdateMarkerArgs,
 } from './implementation';
 
 export class CapacitorGoogleMapsWeb extends WebPlugin implements CapacitorGoogleMapsPlugin {
@@ -279,6 +282,27 @@ export class CapacitorGoogleMapsWeb extends WebPlugin implements CapacitorGoogle
     this.currMarkerId++;
 
     return { id: id };
+  }
+
+  async moveMarker(_args: MoveMarkerArgs): Promise<void> {
+    // TODO: due
+    // this.maps[_args.id].markers[_args.markerId].setMap(null);
+    // delete this.maps[_args.id].markers[_args.markerId];
+  }
+
+  async rotateMarker(_args: RotateMarkerArgs): Promise<void> {
+    // TODO: due
+    // this.maps[_args.id].markers[_args.markerId].setMap(null);
+    // delete this.maps[_args.id].markers[_args.markerId];
+  }
+
+  async updateMarker(_args: UpdateMarkerArgs): Promise<void> {
+    // TODO: due
+    const marker = this.maps[_args.id].markers[_args.markerId];
+    const latlng = new google.maps.LatLng(_args.options.position.lat, _args.options.position.lng);
+    marker.setPosition(latlng);
+    // this.maps[_args.id].markers[_args.markerId].setMap(null);
+    // delete this.maps[_args.id].markers[_args.markerId];
   }
 
   async removeMarkers(_args: RemoveMarkersArgs): Promise<void> {

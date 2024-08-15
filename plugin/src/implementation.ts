@@ -141,6 +141,30 @@ export interface AddMarkersArgs {
   markers: Marker[];
 }
 
+export interface MoveMarkerArgs {
+  id: string;
+  position: LatLng;
+  markerId: string;
+}
+
+export interface RotateMarkerArgs {
+  id: string;
+  degree: number;
+  markerId: string;
+}
+
+export interface UpdateMarkerArgs {
+  id: string;
+  markerId: string;
+  options: UpdateMarkerOptionsArgs
+}
+export interface UpdateMarkerOptionsArgs {
+  position: LatLng;
+  animate: boolean;
+  animationDuration: number;
+  rotation: number;
+}
+
 export interface MapBoundsArgs {
   id: string;
   mapBounds: {
@@ -175,6 +199,9 @@ export interface CapacitorGoogleMapsPlugin extends Plugin {
   disableTouch(args: { id: string }): Promise<void>;
   addMarker(args: AddMarkerArgs): Promise<{ id: string }>;
   addMarkers(args: AddMarkersArgs): Promise<{ ids: string[] }>;
+  moveMarker(args: MoveMarkerArgs): Promise<void>;
+  rotateMarker(args: RotateMarkerArgs): Promise<void>;
+  updateMarker(args: UpdateMarkerArgs): Promise<void>;
   removeMarker(args: RemoveMarkerArgs): Promise<void>;
   removeMarkers(args: RemoveMarkersArgs): Promise<void>;
   addPolygons(args: AddPolygonsArgs): Promise<{ ids: string[] }>;
