@@ -52,6 +52,7 @@ export class CapacitorGoogleMapsWeb extends WebPlugin implements CapacitorGoogle
       };
       markerClusterer?: MarkerClusterer;
       trafficLayer?: google.maps.TrafficLayer;
+      markerSelectors:{[id: string]:HTMLElement}
     };
   } = {};
   private currMarkerId = 0;
@@ -275,7 +276,15 @@ export class CapacitorGoogleMapsWeb extends WebPlugin implements CapacitorGoogle
     const marker = new google.maps.Marker(markerOpts);
 
     const id = '' + this.currMarkerId;
-
+    
+    if (_args.marker.iconUrl) {
+      await new Promise<void>(done => setTimeout(() => {
+        const selector = document.querySelector(`[src*="${_args.marker.iconUrl}"]`);
+        if (selector)
+          this.maps[_args.id].markerSelectors[id] = selector as HTMLElement;
+        done();
+      }, 1000));
+    }
     this.maps[_args.id].markers[id] = marker;
     this.setMarkerListeners(_args.id, id, marker);
 
@@ -299,10 +308,18 @@ export class CapacitorGoogleMapsWeb extends WebPlugin implements CapacitorGoogle
   async updateMarker(_args: UpdateMarkerArgs): Promise<void> {
     // TODO: due
     const marker = this.maps[_args.id].markers[_args.markerId];
+    const markerSelector = this.maps[_args.id].markerSelectors[_args.markerId];
     const latlng = new google.maps.LatLng(_args.options.position.lat, _args.options.position.lng);
     marker.setPosition(latlng);
-    // this.maps[_args.id].markers[_args.markerId].setMap(null);
-    // delete this.maps[_args.id].markers[_args.markerId];
+    if (markerSelector) {
+      if (_args.options.rotation)
+        markerSelector.style.transform = `rotate(${_args.options.rotation}deg)`;
+      else markerSelector.style.transform = ''
+
+      if (_args.options.animationDuration)
+        markerSelector.style.transition = `transform ${_args.options.animationDuration / 1000}s linear`;
+      else markerSelector.style.transition = ''
+    }
   }
 
   async removeMarkers(_args: RemoveMarkersArgs): Promise<void> {
@@ -311,6 +328,7 @@ export class CapacitorGoogleMapsWeb extends WebPlugin implements CapacitorGoogle
     for (const id of _args.markerIds) {
       map.markers[id].setMap(null);
       delete map.markers[id];
+      delete map.markerSelectors[id];
     }
   }
 
@@ -448,6 +466,7 @@ export class CapacitorGoogleMapsWeb extends WebPlugin implements CapacitorGoogle
       map: new window.google.maps.Map(_args.element, { ..._args.config }),
       element: _args.element,
       markers: {},
+      markerSelectors: {},
       polygons: {},
       circles: {},
       polylines: {},

@@ -288,6 +288,8 @@ export default MyMap;
 * [`disableClustering()`](#disableclustering)
 * [`addMarker(...)`](#addmarker)
 * [`addMarkers(...)`](#addmarkers)
+* [`moveMarker(...)`](#movemarker)
+* [`updateMarker(...)`](#updatemarker)
 * [`removeMarker(...)`](#removemarker)
 * [`removeMarkers(...)`](#removemarkers)
 * [`addPolygons(...)`](#addpolygons)
@@ -305,6 +307,7 @@ export default MyMap;
 * [`enableAccessibilityElements(...)`](#enableaccessibilityelements)
 * [`enableCurrentLocation(...)`](#enablecurrentlocation)
 * [`setPadding(...)`](#setpadding)
+* [`getMapBounds()`](#getmapbounds)
 * [`fitBounds(...)`](#fitbounds)
 * [`setOnBoundsChangedListener(...)`](#setonboundschangedlistener)
 * [`setOnCameraIdleListener(...)`](#setoncameraidlelistener)
@@ -413,6 +416,32 @@ addMarkers(markers: Marker[]) => Promise<string[]>
 | **`markers`** | <code>Marker[]</code> |
 
 **Returns:** <code>Promise&lt;string[]&gt;</code>
+
+--------------------
+
+
+### moveMarker(...)
+
+```typescript
+moveMarker(args: MoveMarkerArgs) => Promise<void>
+```
+
+| Param      | Type                                                      |
+| ---------- | --------------------------------------------------------- |
+| **`args`** | <code><a href="#movemarkerargs">MoveMarkerArgs</a></code> |
+
+--------------------
+
+
+### updateMarker(...)
+
+```typescript
+updateMarker(args: UpdateMarkerArgs) => Promise<void>
+```
+
+| Param      | Type                                                          |
+| ---------- | ------------------------------------------------------------- |
+| **`args`** | <code><a href="#updatemarkerargs">UpdateMarkerArgs</a></code> |
 
 --------------------
 
@@ -636,6 +665,19 @@ setPadding(padding: MapPadding) => Promise<void>
 | Param         | Type                                              |
 | ------------- | ------------------------------------------------- |
 | **`padding`** | <code><a href="#mappadding">MapPadding</a></code> |
+
+--------------------
+
+
+### getMapBounds()
+
+```typescript
+getMapBounds() => Promise<LatLngBounds>
+```
+
+Get the map's current viewport latitude and longitude bounds.
+
+**Returns:** <code>Promise&lt;LatLngBounds&gt;</code>
 
 --------------------
 
@@ -958,6 +1000,34 @@ https://tools.ietf.org/html/rfc7946#section-3.1.2
 | ----------------- | --------------------------------------------- | ------------------------------------- |
 | **`type`**        | <code>'<a href="#point">Point</a>'</code>     | Specifies the type of GeoJSON object. |
 | **`coordinates`** | <code><a href="#position">Position</a></code> |                                       |
+
+
+#### MoveMarkerArgs
+
+| Prop           | Type                                      |
+| -------------- | ----------------------------------------- |
+| **`id`**       | <code>string</code>                       |
+| **`position`** | <code><a href="#latlng">LatLng</a></code> |
+| **`markerId`** | <code>string</code>                       |
+
+
+#### UpdateMarkerArgs
+
+| Prop           | Type                                                                        |
+| -------------- | --------------------------------------------------------------------------- |
+| **`id`**       | <code>string</code>                                                         |
+| **`markerId`** | <code>string</code>                                                         |
+| **`options`**  | <code><a href="#updatemarkeroptionsargs">UpdateMarkerOptionsArgs</a></code> |
+
+
+#### UpdateMarkerOptionsArgs
+
+| Prop                    | Type                                      |
+| ----------------------- | ----------------------------------------- |
+| **`position`**          | <code><a href="#latlng">LatLng</a></code> |
+| **`animate`**           | <code>boolean</code>                      |
+| **`animationDuration`** | <code>number</code>                       |
+| **`rotation`**          | <code>number</code>                       |
 
 
 #### Polygon
