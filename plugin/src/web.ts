@@ -340,7 +340,7 @@ export class CapacitorGoogleMapsWeb extends WebPlugin implements CapacitorGoogle
       }, 1000));
     }
     this.maps[_args.id].markers[id] = advancedMarker;
-    this.setMarkerListeners(_args.id, id, advancedMarker);
+    await this.setMarkerListeners(_args.id, id, advancedMarker);
 
     this.currMarkerId++;
 
