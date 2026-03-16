@@ -44,6 +44,7 @@ class CapacitorGoogleMap(
     private var mapView: MapView
     private var googleMap: GoogleMap? = null
     private val markers = HashMap<String, CapacitorGoogleMapMarker>()
+    private val tileOverlays = HashMap<String, CapacitorGoogleMapTileOverlay>()
     private val polygons = HashMap<String, CapacitorGoogleMapsPolygon>()
     private val circles = HashMap<String, CapacitorGoogleMapsCircle>()
     private val polylines = HashMap<String, CapacitorGoogleMapPolyline>()        
@@ -105,6 +106,39 @@ class CapacitorGoogleMap(
                 bridge.webView.setBackgroundColor(Color.TRANSPARENT)
                 if (config.styles != null) {
                     googleMap?.setMapStyle(MapStyleOptions(config.styles!!))
+                }
+
+                if (config.maxZoom != null) {
+                    googleMap?.setMaxZoomPreference(config.maxZoom!!.toFloat())
+                }
+
+                if (config.minZoom != null) {
+                    googleMap?.setMinZoomPreference((config.minZoom!!.toFloat()))
+                }
+
+                if (config.mapTypeId != null) {
+                    when (config.mapTypeId!!) {
+                        "hybrid" -> googleMap?.mapType = GoogleMap.MAP_TYPE_HYBRID
+                        "roadmap" -> googleMap?.mapType = GoogleMap.MAP_TYPE_NORMAL
+                        "satellite" -> googleMap?.mapType = GoogleMap.MAP_TYPE_SATELLITE
+                        "terrain" -> googleMap?.mapType = GoogleMap.MAP_TYPE_TERRAIN
+                    }
+                }
+
+                if (config.restriction != null) {
+                    googleMap?.setLatLngBoundsForCameraTarget(config.restriction!!.latLngBounds)
+                }
+
+                if (config.heading != null) {
+                    googleMap?.cameraPosition?.let { cameraPosition ->
+                        googleMap?.animateCamera(
+                            CameraUpdateFactory.newCameraPosition(
+                                CameraPosition.Builder(cameraPosition)
+                                    .bearing(config.heading!!.toFloat())
+                                    .build()
+                            )
+                        )
+                    }
                 }
             }
         }
@@ -171,6 +205,64 @@ class CapacitorGoogleMap(
                     }
 
             job.join()
+        }
+    }
+
+    fun addTileOverlay(
+        tileOverlay: CapacitorGoogleMapTileOverlay,
+        callback: (Result<String>) -> Unit
+    ) {
+        try {
+            googleMap ?: throw GoogleMapNotAvailable()
+
+            CoroutineScope(Dispatchers.Main).launch {
+                val tileProvider = object : UrlTileProvider(256, 256) {
+                    override fun getTileUrl(x: Int, y: Int, zoom: Int): URL? {
+                        return URL(tileOverlay.url
+                            .replace("{x}", "$x")
+                            .replace("{y}", "$y")
+                            .replace("{z}", "$zoom")
+                        )
+                    }
+                }
+                var tileOverlayOptions = TileOverlayOptions().tileProvider(tileProvider)
+                if (tileOverlay.zIndex != null) {
+                    tileOverlayOptions.zIndex(tileOverlay.zIndex!!)
+                }
+                if (tileOverlay.visible != null) {
+                    tileOverlayOptions.visible(tileOverlay.visible!!)
+                }
+                if (tileOverlay.opacity != null) {
+                    tileOverlayOptions.transparency(tileOverlay.opacity!!)
+                }
+
+                val googleMapTileOverlay = googleMap?.addTileOverlay(tileOverlayOptions)
+
+                tileOverlay.googleMapTileOverlay = googleMapTileOverlay
+                tileOverlays[googleMapTileOverlay!!.id] = tileOverlay
+
+                callback(Result.success(googleMapTileOverlay.id))
+            }
+        } catch (e: GoogleMapsError) {
+            callback(Result.failure(e))
+        }
+    }
+
+    fun removeTileOverlay(id: String, callback: (error: GoogleMapsError?) -> Unit) {
+        try {
+            googleMap ?: throw GoogleMapNotAvailable()
+
+            val tileOverlay = tileOverlays[id]
+            tileOverlay ?: throw TileOverlayNotFoundError()
+
+            CoroutineScope(Dispatchers.Main).launch {
+                tileOverlay.googleMapTileOverlay?.remove()
+                tileOverlays.remove(id)
+
+                callback(null)
+            }
+        } catch (e: GoogleMapsError) {
+            callback(e)
         }
     }
 

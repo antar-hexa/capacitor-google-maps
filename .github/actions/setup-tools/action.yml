@@ -1,14 +1,14 @@
-name: 'Setup Tools'
-description: 'Setup tools needed in repo'
+name: "Setup Tools"
+description: "Setup tools needed in repo"
 
 inputs:
   skip-install-on-cache-hit:
-    description: 'If a Cache Hit happens, skip pnpm install'
+    description: "If a Cache Hit happens, skip pnpm install"
     required: true
-    default: 'false'
+    default: "false"
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: Install Node.js
       uses: actions/setup-node@v3
@@ -35,11 +35,11 @@ runs:
         STORE_PATH: ${{ env.STORE_PATH }}
       with:
         path: ${{ env.STORE_PATH }}
-        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
         restore-keys: |
           ${{ runner.os }}-pnpm-store-
 
     - name: Install dependencies
       if: inputs.skip-install-on-cache-hit == 'false' || (inputs.skip-install-on-cache-hit == 'true' && steps.cache-pnpm-store.cache-hit == 'false')
       shell: bash
-      run: pnpm install
+      run: pnpm install --no-frozen-lockfile
